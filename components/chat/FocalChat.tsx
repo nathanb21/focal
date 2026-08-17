@@ -98,7 +98,7 @@ export function FocalChat({ chat, onOpenSidebar, onMessagesChange, onTitleChange
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-      <header className="flex h-[72px] shrink-0 items-center justify-between border-b border-slate-200/70 bg-white/70 px-5 backdrop-blur sm:px-8 lg:px-12">
+      <header className="flex h-[80px] shrink-0 items-center justify-between border-b border-slate-200/70 bg-white/70 px-6 backdrop-blur sm:px-10 lg:px-14">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <button
             onClick={onOpenSidebar}
@@ -108,11 +108,11 @@ export function FocalChat({ chat, onOpenSidebar, onMessagesChange, onTitleChange
             <Menu className="h-4 w-4" />
           </button>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[13px] font-semibold text-slate-800">{chat.title}</p>
-            <p className="mt-1 hidden text-[10px] text-slate-400 sm:block">Citations included with every answer</p>
+            <p className="truncate text-[15px] font-semibold text-slate-800">{chat.title}</p>
+            <p className="mt-1 hidden text-[11px] text-slate-400 sm:block">Citations included with every answer</p>
           </div>
         </div>
-        <div className="ml-6 hidden shrink-0 items-center gap-2 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-medium text-slate-500 sm:flex">
+        <div className="ml-6 hidden shrink-0 items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-[11px] font-medium text-slate-500 sm:flex">
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
           <span>Controlled workspace</span>
         </div>
@@ -150,17 +150,17 @@ function EmptyState({ onPrompt }: { onPrompt: (prompt: string) => void }) {
 
   return (
     <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto px-5 pb-28 pt-12 sm:px-8">
-      <div className="w-full max-w-[700px]">
-        <div className="mb-10 text-center">
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-blue-600">Query your documentation</p>
-          <p className="mx-auto max-w-[490px] text-[13px] leading-6 text-slate-500">Ask questions across batch records, deviations, SOPs, validation protocols, and audit logs.</p>
+      <div className="w-full max-w-[820px]">
+        <div className="mb-12 text-center">
+          <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-blue-600">Query your documentation</p>
+          <p className="mx-auto max-w-[600px] text-[15px] leading-7 text-slate-500">Ask questions across batch records, deviations, SOPs, validation protocols, and audit logs.</p>
         </div>
-        <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Suggested questions</p>
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Suggested questions</p>
         <div className="grid gap-2.5 sm:grid-cols-3">
           {prompts.map(({ icon: Icon, label, prompt }) => (
-            <button key={label} onClick={() => onPrompt(prompt)} className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left shadow-soft transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
+            <button key={label} onClick={() => onPrompt(prompt)} className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-5 text-left shadow-soft transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
               <Icon className="h-4 w-4 shrink-0 text-slate-400 transition-colors group-hover:text-blue-600" />
-              <span className="text-[12px] font-semibold text-slate-800">{label}</span>
+              <span className="text-[14px] font-semibold text-slate-800">{label}</span>
             </button>
           ))}
         </div>

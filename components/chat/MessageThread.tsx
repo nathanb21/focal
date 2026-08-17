@@ -34,7 +34,7 @@ export function MessageThread({ messages, isStreaming, onCitation }: MessageThre
   );
 
   return (
-    <div className="mx-auto w-full max-w-[920px] px-5 pb-32 pt-8 sm:px-8 lg:px-12">
+    <div className="mx-auto w-full max-w-[1120px] px-6 pb-36 pt-10 sm:px-10 lg:px-14">
       {parsedMessages.length === 0 ? (
         <div className="hidden" />
       ) : (

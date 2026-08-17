@@ -29,7 +29,7 @@ export function MessageBubble({ message, response, onCitation, isStreaming }: Me
   if (isUser) {
     return (
       <div className="flex justify-end py-4">
-        <div className="max-w-[min(620px,80%)] rounded-2xl rounded-br-md bg-slate-900 px-4 py-3 text-[13px] leading-6 text-white shadow-sm">
+        <div className="max-w-[min(760px,80%)] rounded-2xl rounded-br-md bg-slate-900 px-5 py-3.5 text-[15px] leading-7 text-white shadow-sm">
           {message.content}
         </div>
       </div>
@@ -39,13 +39,13 @@ export function MessageBubble({ message, response, onCitation, isStreaming }: Me
   return (
     <div className="group flex gap-3 py-5">
       <AssistantMark />
-      <div className="min-w-0 max-w-[720px] flex-1">
+      <div className="min-w-0 max-w-[840px] flex-1">
         <div className="mb-1.5 flex items-center gap-2">
-          <span className="text-[12px] font-semibold text-slate-900">Focal</span>
-          <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-[0.08em] text-slate-400">Assistant</span>
+          <span className="text-[13px] font-semibold text-slate-900">Focal</span>
+          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.08em] text-slate-400">Assistant</span>
         </div>
         {response ? (
-          <div className="text-[14px] leading-7 text-slate-700">
+          <div className="text-[16px] leading-8 text-slate-700">
             {response.answer.segments.map((segment, index) => {
               if (segment.type === "text") return <span key={`${segment.content}-${index}`}>{segment.content}</span>;
               const citation = response.citations.find((item) => item.id === segment.citationId);
@@ -53,7 +53,7 @@ export function MessageBubble({ message, response, onCitation, isStreaming }: Me
             })}
           </div>
         ) : (
-          <div className="flex items-center gap-2 py-1 text-[13px] text-slate-400">
+          <div className="flex items-center gap-2 py-1 text-[15px] text-slate-400">
             {isStreaming ? (
               <>
                 <span className="flex gap-1">
@@ -68,7 +68,7 @@ export function MessageBubble({ message, response, onCitation, isStreaming }: Me
             )}
           </div>
         )}
-        <button onClick={copyAnswer} className="mt-3 inline-flex items-center gap-1.5 text-[10px] text-slate-400 opacity-0 transition-opacity hover:text-slate-600 group-hover:opacity-100" aria-label="Copy answer">
+        <button onClick={copyAnswer} className="mt-3 inline-flex items-center gap-1.5 text-[11px] text-slate-400 opacity-0 transition-opacity hover:text-slate-600 group-hover:opacity-100" aria-label="Copy answer">
           {copied ? <CheckCheck className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
           {copied ? "Copied" : "Copy answer"}
         </button>

@@ -135,7 +135,7 @@ export default function Home() {
         <Sidebar chats={chats} activeChatId={activeChatId} onSelectChat={selectChat} onNewChat={createChat} onDeleteChat={deleteChat} onRenameChat={renameChat} />
       </div>
       <AnimatedSheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
-        <SheetContent forceMount side="left" className="w-[286px] max-w-[286px] p-0">
+        <SheetContent forceMount side="left" className="w-[320px] max-w-[320px] p-0">
           <Sidebar chats={chats} activeChatId={activeChatId} onSelectChat={selectChat} onNewChat={createChat} onDeleteChat={deleteChat} onRenameChat={renameChat} />
         </SheetContent>
       </AnimatedSheet>
