@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 210 40% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --primary: 215 74% 46%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 32% 96%;
+  --secondary-foreground: 222 47% 20%;
+  --muted: 210 32% 96%;
+  --muted-foreground: 215 16% 47%;
+  --accent: 210 36% 95%;
+  --accent-foreground: 215 74% 38%;
+  --border: 214 28% 90%;
+  --input: 214 28% 86%;
+  --ring: 215 74% 46%;
+  --radius: 0.7rem;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: hsl(215 74% 46% / 0.18);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: hsl(215 16% 75% / 0.55);
+  background-clip: padding-box;
+}
+
+@keyframes focal-sheet-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes focal-sheet-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes focal-sheet-slide-in-left {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes focal-sheet-slide-out-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+@keyframes focal-sheet-slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes focal-sheet-slide-out-right {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+
+.focal-sheet-overlay[data-state="open"] {
+  animation: focal-sheet-fade-in 180ms ease-out;
+}
+
+.focal-sheet-overlay[data-state="closed"] {
+  animation: focal-sheet-fade-out 140ms ease-in forwards;
+}
+
+.focal-sheet-content[data-side="left"][data-state="open"] {
+  animation: focal-sheet-slide-in-left 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.focal-sheet-content[data-side="left"][data-state="closed"] {
+  animation: focal-sheet-slide-out-left 180ms ease-in forwards;
+}
+
+.focal-sheet-content[data-side="right"][data-state="open"] {
+  animation: focal-sheet-slide-in-right 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.focal-sheet-content[data-side="right"][data-state="closed"] {
+  animation: focal-sheet-slide-out-right 180ms ease-in forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .focal-sheet-overlay,
+  .focal-sheet-content {
+    animation: none !important;
+  }
+}
