@@ -7,6 +7,7 @@ import { FileSearch, GitPullRequest, Menu, ShieldCheck } from "lucide-react";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { CitationPanel } from "@/components/chat/CitationPanel";
 import { MessageThread } from "@/components/chat/MessageThread";
+import { BrandMark } from "@/components/BrandMark";
 import type { Citation, StoredChat, StoredMessage } from "@/lib/types";
 
 type FocalChatProps = {
@@ -152,6 +153,9 @@ function EmptyState({ onPrompt }: { onPrompt: (prompt: string) => void }) {
     <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto px-5 pb-28 pt-12 sm:px-8">
       <div className="w-full max-w-[820px]">
         <div className="mb-12 text-center">
+          <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50">
+            <BrandMark size="md" />
+          </div>
           <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.16em] text-blue-600">Query your documentation</p>
           <p className="mx-auto max-w-[600px] text-[15px] leading-7 text-slate-500">Ask questions across batch records, deviations, SOPs, validation protocols, and audit logs.</p>
         </div>
