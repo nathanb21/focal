@@ -1,4 +1,5 @@
 import { convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse, Output, streamText } from "ai";
+import { FOCAL_MODEL } from "@/lib/ai";
 import { focalResponseSchema } from "@/lib/schema";
 import { fallbackResponse } from "@/lib/demo";
 
@@ -28,7 +29,7 @@ export async function POST(request: Request) {
 
   const modelMessages = await convertToModelMessages(messages as never[]);
   const result = streamText({
-    model: "openai/gpt-5-mini",
+    model: FOCAL_MODEL,
     system: SYSTEM_PROMPT,
     messages: modelMessages,
     output: Output.object({ schema: focalResponseSchema }),

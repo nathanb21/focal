@@ -12,10 +12,26 @@ import type { Citation, StoredChat, StoredMessage } from "@/lib/types";
 
 type FocalChatProps = {
   chat: StoredChat;
+  isActive: boolean;
   onOpenSidebar?: () => void;
   onMessagesChange: (messages: StoredMessage[]) => void;
   onTitleChange: (title: string) => void;
 };
+
+const WORKING_STATEMENTS = [
+  "Sending your question…",
+  "Searching the document library…",
+  "Reviewing the most relevant sources…",
+  "Comparing related documents…",
+  "Checking the available evidence…",
+  "Following the relevant references…",
+  "Cross-checking key details…",
+  "Assessing the supporting information…",
+  "Connecting the relevant findings…",
+  "Preparing a clear response…",
+  "Adding source references…",
+  "Finalising the answer…",
+];
 
 function messageText(message: { parts?: Array<{ type: string; text?: string }>; content?: string }) {
   if (message.parts) {
@@ -27,10 +43,11 @@ function messageText(message: { parts?: Array<{ type: string; text?: string }>; 
   return message.content ?? "";
 }
 
-export function FocalChat({ chat, onOpenSidebar, onMessagesChange, onTitleChange }: FocalChatProps) {
+export function FocalChat({ chat, isActive, onOpenSidebar, onMessagesChange, onTitleChange }: FocalChatProps) {
   const [input, setInput] = useState("");
   const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
   const [citationPanelOpen, setCitationPanelOpen] = useState(false);
+  const [workingStep, setWorkingStep] = useState(0);
   const hadUserMessageOnMount = useRef(chat.messages.some((message) => message.role === "user"));
   const titleRequestMessageId = useRef<string | null>(null);
 
@@ -50,6 +67,23 @@ export function FocalChat({ chat, onOpenSidebar, onMessagesChange, onTitleChange
   });
 
   const isStreaming = status === "submitted" || status === "streaming";
+
+  useEffect(() => {
+    if (!isStreaming) {
+      setWorkingStep(0);
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setWorkingStep((currentStep) => (currentStep + 1) % WORKING_STATEMENTS.length);
+    }, 5000);
+
+    return () => window.clearInterval(intervalId);
+  }, [isStreaming]);
+
+  useEffect(() => {
+    if (!isActive) setCitationPanelOpen(false);
+  }, [isActive]);
 
   useEffect(() => {
     const nextMessages: StoredMessage[] = messages.map((message, index) => ({
@@ -85,6 +119,32 @@ export function FocalChat({ chat, onOpenSidebar, onMessagesChange, onTitleChange
       .catch(() => undefined);
   }, [chat.titleEdited, messages, onTitleChange]);
 
+  const storedMessages = useMemo(
+    () =>
+      messages.map((message, index) => ({
+        id: message.id || `${chat.id}-${index}`,
+        role: message.role === "user" ? "user" as const : "assistant" as const,
+        content: messageText(message),
+        createdAt: new Date().toISOString(),
+      })),
+    [chat.id, messages],
+  );
+
+  const displayMessages = useMemo(() => {
+    const lastMessage = storedMessages[storedMessages.length - 1];
+    if (!isStreaming || lastMessage?.role !== "user") return storedMessages;
+
+    return [
+      ...storedMessages,
+      {
+        id: `${chat.id}-pending-assistant`,
+        role: "assistant" as const,
+        content: "",
+        createdAt: new Date().toISOString(),
+      },
+    ];
+  }, [chat.id, isStreaming, storedMessages]);
+
   const submit = (prompt = input) => {
     const trimmed = prompt.trim();
     if (!trimmed || isStreaming) return;
@@ -98,7 +158,7 @@ export function FocalChat({ chat, onOpenSidebar, onMessagesChange, onTitleChange
   };
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+    <div className={isActive ? "relative flex min-h-0 flex-1 flex-col overflow-hidden" : "hidden"}>
       <header className="flex h-[80px] shrink-0 items-center justify-between border-b border-slate-200/70 bg-white/70 px-6 backdrop-blur sm:px-10 lg:px-14">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <button
@@ -124,20 +184,16 @@ export function FocalChat({ chat, onOpenSidebar, onMessagesChange, onTitleChange
       ) : (
         <div className="min-h-0 flex-1 overflow-y-auto">
           <MessageThread
-            messages={messages.map((message, index) => ({
-              id: message.id || `${chat.id}-${index}`,
-              role: message.role === "user" ? "user" : "assistant",
-              content: messageText(message),
-              createdAt: new Date().toISOString(),
-            }))}
+            messages={displayMessages}
             isStreaming={isStreaming}
+            workingMessage={WORKING_STATEMENTS[workingStep]}
             onCitation={openCitation}
           />
         </div>
       )}
 
       <ChatInput value={input} onChange={setInput} onSubmit={() => submit()} disabled={isStreaming} />
-      <CitationPanel citation={selectedCitation} open={citationPanelOpen} onOpenChange={setCitationPanelOpen} />
+      {isActive && <CitationPanel citation={selectedCitation} open={citationPanelOpen} onOpenChange={setCitationPanelOpen} />}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { generateText } from "ai";
+import { FOCAL_MODEL } from "@/lib/ai";
 import { fallbackChatTitle } from "@/lib/title";
 
 export const maxDuration = 10;
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
 
   try {
     const result = await generateText({
-      model: "openai/gpt-5-mini",
+      model: FOCAL_MODEL,
       system: TITLE_PROMPT,
       prompt: message,
     });

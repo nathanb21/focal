@@ -7,20 +7,37 @@ import type { Citation, FocalResponse, StoredMessage } from "@/lib/types";
 type MessageThreadProps = {
   messages: StoredMessage[];
   isStreaming: boolean;
+  workingMessage: string;
   onCitation: (citation: Citation) => void;
 };
 
 export function parseFocalResponse(content: string): FocalResponse | null {
-  try {
-    const parsed = JSON.parse(content) as FocalResponse;
-    if (!parsed?.answer?.segments || !Array.isArray(parsed.citations)) return null;
-    return parsed;
-  } catch {
-    return null;
+  const trimmed = content.trim();
+  if (!trimmed) return null;
+
+  const candidates = [
+    trimmed,
+    trimmed.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim(),
+  ];
+  const objectStart = trimmed.indexOf("{");
+  const objectEnd = trimmed.lastIndexOf("}");
+  if (objectStart >= 0 && objectEnd > objectStart) {
+    candidates.push(trimmed.slice(objectStart, objectEnd + 1));
   }
+
+  for (const candidate of candidates) {
+    try {
+      const parsed = JSON.parse(candidate) as FocalResponse;
+      if (parsed?.answer?.segments && Array.isArray(parsed.citations)) return parsed;
+    } catch {
+      // Try the next common response wrapper before falling back to plain text.
+    }
+  }
+
+  return null;
 }
 
-export function MessageThread({ messages, isStreaming, onCitation }: MessageThreadProps) {
+export function MessageThread({ messages, isStreaming, workingMessage, onCitation }: MessageThreadProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const lastMessage = messages[messages.length - 1];
 
@@ -45,6 +62,7 @@ export function MessageThread({ messages, isStreaming, onCitation }: MessageThre
               message={message}
               response={response}
               isStreaming={isStreaming && index === parsedMessages.length - 1 && message.role === "assistant"}
+              workingMessage={workingMessage}
               onCitation={onCitation}
             />
           ))}

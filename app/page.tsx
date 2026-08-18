@@ -139,15 +139,16 @@ export default function Home() {
           <Sidebar chats={chats} activeChatId={activeChatId} onSelectChat={selectChat} onNewChat={createChat} onDeleteChat={deleteChat} onRenameChat={renameChat} />
         </SheetContent>
       </AnimatedSheet>
-      {activeChat ? (
+      {activeChat ? chats.map((chat) => (
         <FocalChat
-          key={activeChat.id}
-          chat={activeChat}
-          onOpenSidebar={() => setMobileSidebarOpen(true)}
-          onMessagesChange={(messages) => updateMessages(activeChat.id, messages)}
-          onTitleChange={(title) => updateGeneratedTitle(activeChat.id, title)}
+          key={chat.id}
+          chat={chat}
+          isActive={chat.id === activeChat.id}
+          onOpenSidebar={chat.id === activeChat.id ? () => setMobileSidebarOpen(true) : undefined}
+          onMessagesChange={(messages) => updateMessages(chat.id, messages)}
+          onTitleChange={(title) => updateGeneratedTitle(chat.id, title)}
         />
-      ) : (
+      )) : (
         <div className="flex flex-1 items-center justify-center text-sm text-slate-400">Create a chat to get started.</div>
       )}
     </main>

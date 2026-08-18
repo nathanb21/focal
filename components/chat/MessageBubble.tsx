@@ -11,9 +11,10 @@ type MessageBubbleProps = {
   response: FocalResponse | null;
   onCitation: (citation: Citation) => void;
   isStreaming?: boolean;
+  workingMessage?: string;
 };
 
-export function MessageBubble({ message, response, onCitation, isStreaming }: MessageBubbleProps) {
+export function MessageBubble({ message, response, onCitation, isStreaming, workingMessage }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
   const isUser = message.role === "user";
 
@@ -61,8 +62,10 @@ export function MessageBubble({ message, response, onCitation, isStreaming }: Me
                   <i className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-500 [animation-delay:120ms]" />
                   <i className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-500 [animation-delay:240ms]" />
                 </span>
-                Searching the document library…
+                {workingMessage ?? "Working through the document library…"}
               </>
+            ) : message.content ? (
+              <div className="whitespace-pre-wrap text-slate-700">{message.content}</div>
             ) : (
               <><Sparkles className="h-3.5 w-3.5" /> Unable to format this response.</>
             )}
