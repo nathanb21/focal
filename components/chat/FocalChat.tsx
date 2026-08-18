@@ -48,6 +48,7 @@ export function FocalChat({ chat, isActive, onOpenSidebar, onMessagesChange, onT
   const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
   const [citationPanelOpen, setCitationPanelOpen] = useState(false);
   const [workingStep, setWorkingStep] = useState(0);
+  const messageViewportRef = useRef<HTMLDivElement>(null);
   const hadUserMessageOnMount = useRef(chat.messages.some((message) => message.role === "user"));
   const titleRequestMessageId = useRef<string | null>(null);
 
@@ -84,6 +85,17 @@ export function FocalChat({ chat, isActive, onOpenSidebar, onMessagesChange, onT
   useEffect(() => {
     if (!isActive) setCitationPanelOpen(false);
   }, [isActive]);
+
+  useEffect(() => {
+    if (!isActive || messages.length === 0) return;
+
+    const frameId = window.requestAnimationFrame(() => {
+      const viewport = messageViewportRef.current;
+      if (viewport) viewport.scrollTop = viewport.scrollHeight;
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [isActive, messages.length]);
 
   useEffect(() => {
     const nextMessages: StoredMessage[] = messages
@@ -189,10 +201,9 @@ export function FocalChat({ chat, isActive, onOpenSidebar, onMessagesChange, onT
       {messages.length === 0 ? (
         <EmptyState onPrompt={submit} />
       ) : (
-        <div className="min-h-0 flex-1 overflow-y-auto">
+        <div ref={messageViewportRef} className="min-h-0 flex-1 overflow-y-auto">
           <MessageThread
             messages={displayMessages}
-            isActive={isActive}
             isStreaming={isStreaming}
             workingMessage={WORKING_STATEMENTS[workingStep]}
             errorMessage={error?.message}
