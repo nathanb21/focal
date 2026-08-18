@@ -61,7 +61,7 @@ export function FocalChat({ chat, isActive, onOpenSidebar, onMessagesChange, onT
     [chat.messages],
   );
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, regenerate, clearError, status, error } = useChat({
     messages: initialMessages,
     transport: new DefaultChatTransport({ api: "/api/chat" }),
   });
@@ -86,12 +86,14 @@ export function FocalChat({ chat, isActive, onOpenSidebar, onMessagesChange, onT
   }, [isActive]);
 
   useEffect(() => {
-    const nextMessages: StoredMessage[] = messages.map((message, index) => ({
-      id: message.id || `${chat.id}-${index}`,
-      role: message.role === "user" ? "user" : "assistant",
-      content: messageText(message),
-      createdAt: new Date().toISOString(),
-    }));
+    const nextMessages: StoredMessage[] = messages
+      .map((message, index) => ({
+        id: message.id || `${chat.id}-${index}`,
+        role: message.role === "user" ? "user" as const : "assistant" as const,
+        content: messageText(message),
+        createdAt: new Date().toISOString(),
+      }))
+      .filter((message) => message.role === "user" || message.content.trim());
     onMessagesChange(nextMessages);
     // The parent callback is intentionally not a dependency: it is stable for a chat instance.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -157,6 +159,11 @@ export function FocalChat({ chat, isActive, onOpenSidebar, onMessagesChange, onT
     setCitationPanelOpen(true);
   };
 
+  const retry = () => {
+    clearError();
+    void regenerate();
+  };
+
   return (
     <div className={isActive ? "relative flex min-h-0 flex-1 flex-col overflow-hidden" : "hidden"}>
       <header className="flex h-[80px] shrink-0 items-center justify-between border-b border-slate-200/70 bg-white/70 px-6 backdrop-blur sm:px-10 lg:px-14">
@@ -187,6 +194,8 @@ export function FocalChat({ chat, isActive, onOpenSidebar, onMessagesChange, onT
             messages={displayMessages}
             isStreaming={isStreaming}
             workingMessage={WORKING_STATEMENTS[workingStep]}
+            errorMessage={error?.message}
+            onRetry={retry}
             onCitation={openCitation}
           />
         </div>

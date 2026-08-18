@@ -35,7 +35,17 @@ export async function POST(request: Request) {
     output: Output.object({ schema: focalResponseSchema }),
   });
 
-  return result.toUIMessageStreamResponse();
+  return result.toUIMessageStreamResponse({ onError: formatStreamError });
+}
+
+function formatStreamError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+
+  if (/free tier|not have access|model.*(unavailable|not available)/i.test(message)) {
+    return "This model is not available on the current AI Gateway plan.";
+  }
+
+  return "Focal could not complete that response. Please try again.";
 }
 
 function fallbackStream(value: string) {
