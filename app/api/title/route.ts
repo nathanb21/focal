@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "A message is required." }, { status: 400 });
   }
 
-  if (!process.env.AI_GATEWAY_API_KEY && !process.env.VERCEL_OIDC_TOKEN) {
+  if (!process.env.ANTHROPIC_API_KEY) {
     return Response.json({ title: fallbackChatTitle(message) });
   }
 

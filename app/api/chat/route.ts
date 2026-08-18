@@ -21,9 +21,8 @@ export async function POST(request: Request) {
     .map((part) => part.text ?? "")
     .join("") || latestMessage?.content || "the document library";
 
-  // The UI remains useful as a portfolio demo without a gateway credential. On Vercel,
-  // the AI SDK can authenticate through the platform's AI Gateway configuration.
-  if (!process.env.AI_GATEWAY_API_KEY && !process.env.VERCEL_OIDC_TOKEN) {
+  // The UI remains useful as a portfolio demo without an Anthropic credential.
+  if (!process.env.ANTHROPIC_API_KEY) {
     return fallbackStream(JSON.stringify(fallbackResponse(question)));
   }
 
@@ -35,17 +34,7 @@ export async function POST(request: Request) {
     output: Output.object({ schema: focalResponseSchema }),
   });
 
-  return result.toUIMessageStreamResponse({ onError: formatStreamError });
-}
-
-function formatStreamError(error: unknown) {
-  const message = error instanceof Error ? error.message : String(error);
-
-  if (/free tier|not have access|model.*(unavailable|not available)/i.test(message)) {
-    return "This model is not available on the current AI Gateway plan.";
-  }
-
-  return "Focal could not complete that response. Please try again.";
+  return result.toUIMessageStreamResponse();
 }
 
 function fallbackStream(value: string) {
