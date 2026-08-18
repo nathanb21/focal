@@ -192,6 +192,7 @@ export function FocalChat({ chat, isActive, onOpenSidebar, onMessagesChange, onT
         <div className="min-h-0 flex-1 overflow-y-auto">
           <MessageThread
             messages={displayMessages}
+            isActive={isActive}
             isStreaming={isStreaming}
             workingMessage={WORKING_STATEMENTS[workingStep]}
             errorMessage={error?.message}

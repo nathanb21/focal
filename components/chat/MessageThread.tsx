@@ -8,6 +8,7 @@ import type { Citation, FocalResponse, StoredMessage } from "@/lib/types";
 
 type MessageThreadProps = {
   messages: StoredMessage[];
+  isActive: boolean;
   isStreaming: boolean;
   workingMessage: string;
   errorMessage?: string;
@@ -41,13 +42,31 @@ export function parseFocalResponse(content: string): FocalResponse | null {
   return null;
 }
 
-export function MessageThread({ messages, isStreaming, workingMessage, errorMessage, onRetry, onCitation }: MessageThreadProps) {
+export function MessageThread({ messages, isActive, isStreaming, workingMessage, errorMessage, onRetry, onCitation }: MessageThreadProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const jumpOnActivationRef = useRef(false);
   const lastMessage = messages[messages.length - 1];
 
   useEffect(() => {
+    if (!isActive) return;
+
+    jumpOnActivationRef.current = true;
+    const frameId = window.requestAnimationFrame(() => {
+      bottomRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [isActive]);
+
+  useEffect(() => {
+    if (!isActive) return;
+    if (jumpOnActivationRef.current) {
+      jumpOnActivationRef.current = false;
+      return;
+    }
+
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages.length, lastMessage?.content]);
+  }, [isActive, messages.length, lastMessage?.content]);
 
   const parsedMessages = useMemo(() => {
     const visibleMessages = errorMessage && lastMessage?.role === "assistant" && !lastMessage.content.trim()
