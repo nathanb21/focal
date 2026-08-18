@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { RefreshCw, TriangleAlert } from "lucide-react";
 import { AssistantMark } from "@/components/AssistantMark";
 import { MessageBubble } from "@/components/chat/MessageBubble";
@@ -42,18 +42,7 @@ export function parseFocalResponse(content: string): FocalResponse | null {
 }
 
 export function MessageThread({ messages, isStreaming, workingMessage, errorMessage, onRetry, onCitation }: MessageThreadProps) {
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const hasMountedRef = useRef(false);
   const lastMessage = messages[messages.length - 1];
-
-  useEffect(() => {
-    if (!hasMountedRef.current) {
-      hasMountedRef.current = true;
-      return;
-    }
-
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages.length, lastMessage?.content]);
 
   const parsedMessages = useMemo(() => {
     const visibleMessages = errorMessage && lastMessage?.role === "assistant" && !lastMessage.content.trim()
@@ -103,7 +92,6 @@ export function MessageThread({ messages, isStreaming, workingMessage, errorMess
           </div>
         </div>
       )}
-      <div ref={bottomRef} />
     </div>
   );
 }

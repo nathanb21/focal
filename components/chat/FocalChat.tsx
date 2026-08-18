@@ -48,7 +48,10 @@ export function FocalChat({ chat, isActive, onOpenSidebar, onMessagesChange, onT
   const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
   const [citationPanelOpen, setCitationPanelOpen] = useState(false);
   const [workingStep, setWorkingStep] = useState(0);
+  const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
   const messageViewportRef = useRef<HTMLDivElement>(null);
+  const autoScrollEnabledRef = useRef(true);
+  const programmaticScrollRef = useRef(false);
   const hadUserMessageOnMount = useRef(chat.messages.some((message) => message.role === "user"));
   const titleRequestMessageId = useRef<string | null>(null);
 
@@ -85,17 +88,6 @@ export function FocalChat({ chat, isActive, onOpenSidebar, onMessagesChange, onT
   useEffect(() => {
     if (!isActive) setCitationPanelOpen(false);
   }, [isActive]);
-
-  useEffect(() => {
-    if (!isActive || messages.length === 0) return;
-
-    const frameId = window.requestAnimationFrame(() => {
-      const viewport = messageViewportRef.current;
-      if (viewport) viewport.scrollTop = viewport.scrollHeight;
-    });
-
-    return () => window.cancelAnimationFrame(frameId);
-  }, [isActive, messages.length]);
 
   useEffect(() => {
     const nextMessages: StoredMessage[] = messages
@@ -159,9 +151,44 @@ export function FocalChat({ chat, isActive, onOpenSidebar, onMessagesChange, onT
     ];
   }, [chat.id, isStreaming, storedMessages]);
 
+  const latestMessageContent = storedMessages[storedMessages.length - 1]?.content;
+
+  useEffect(() => {
+    if (!isActive || !autoScrollEnabled || messages.length === 0) return;
+
+    const frameId = window.requestAnimationFrame(() => {
+      const viewport = messageViewportRef.current;
+      if (!viewport || !autoScrollEnabledRef.current) return;
+
+      programmaticScrollRef.current = true;
+      viewport.scrollTop = viewport.scrollHeight;
+      window.requestAnimationFrame(() => {
+        programmaticScrollRef.current = false;
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [autoScrollEnabled, error?.message, isActive, latestMessageContent, messages.length]);
+
+  const handleViewportScroll = () => {
+    if (programmaticScrollRef.current) return;
+
+    const viewport = messageViewportRef.current;
+    const distanceFromBottom = viewport
+      ? viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight
+      : 0;
+    if (distanceFromBottom <= 1) return;
+
+    autoScrollEnabledRef.current = false;
+    setAutoScrollEnabled(false);
+  };
+
   const submit = (prompt = input) => {
     const trimmed = prompt.trim();
     if (!trimmed || isStreaming) return;
+
+    autoScrollEnabledRef.current = true;
+    setAutoScrollEnabled(true);
     sendMessage({ text: trimmed });
     setInput("");
   };
@@ -201,7 +228,7 @@ export function FocalChat({ chat, isActive, onOpenSidebar, onMessagesChange, onT
       {messages.length === 0 ? (
         <EmptyState onPrompt={submit} />
       ) : (
-        <div ref={messageViewportRef} className="min-h-0 flex-1 overflow-y-auto">
+        <div ref={messageViewportRef} onScroll={handleViewportScroll} className="min-h-0 flex-1 overflow-y-auto">
           <MessageThread
             messages={displayMessages}
             isStreaming={isStreaming}
